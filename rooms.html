@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>Rooms - Mazvikadei Resort</title><link rel="stylesheet" href="styles.css" /></head>
+<body>
+  <header class="site-header"><div class="container header-inner"><div class="brand"><img src="assets/logo.jpg" style="height:42px;margin-right:.6rem;vertical-align:middle">Mazvikadei Resort</div><nav class="nav"><a href="index.html">Home</a><a href="rooms.html" class="active">Rooms</a><a href="activities.html">Activities</a><a href="events.html">Events</a><a href="bookings.html">Bookings</a></nav></div></header>
+  <main class="container">
+    <h1>Rooms & Accommodation</h1>
+    <p class="muted">Choose a room, pick check-in/out dates and book.</p>
+    <div class="search-row card">
+      <label>Check-in: <input id="checkin" type="date"></label>
+      <label>Check-out: <input id="checkout" type="date"></label>
+      <label>Guests: <input id="guests" type="number" min="1" value="2"></label>
+      <input id="roomSearch" placeholder="Search rooms or amenities" style="padding:.5rem;border-radius:8px;border:1px solid #e6eef5">
+      <button id="searchBtn" class="btn primary">Search</button>
+    </div>
+    <div id="roomsList" class="rooms-grid"></div>
+  </main>
+  <footer class="site-footer container">© <span id="year"></span> Mazvikadei Resort</footer>
+  <script src="app.js"></script>
+</body>
+</html>

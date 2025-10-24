@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Events - Mazvikadei Resort</title><link rel="stylesheet" href="styles.css"/></head><body>
+<header class="site-header"><div class="container header-inner"><div class="brand"><img src="assets/logo.jpg" style="height:42px;margin-right:.6rem;vertical-align:middle">Mazvikadei Resort</div><nav class="nav"><a href="index.html">Home</a><a href="rooms.html">Rooms</a><a href="activities.html">Activities</a><a href="events.html" class="active">Events</a><a href="bookings.html">Bookings</a></nav></div></header>
+<main class="container">
+  <h1>Event Bookings</h1>
+  <p class="muted">Book venues for weddings, parties, conferences and retreats.</p>
+  <div class="card">
+    <form id="eventForm">
+      <div class="form-row"><input name="title" required placeholder="Event title (e.g., Wedding)"></div>
+      <div class="form-row"><input name="date" type="date" required></div>
+      <div class="form-row"><input name="time" type="time" required></div>
+      <div class="form-row"><input name="guests" type="number" min="1" value="50" required></div>
+      <div class="form-row"><select name="catering"><option value="none">No catering</option><option value="basic">Basic</option><option value="premium">Premium</option></select></div>
+      <div class="form-row"><input type="file" id="attachment"></div>
+      <div style="margin-top:.6rem"><button class="btn primary">Request Booking</button></div>
+      <div id="eventStatus" class="muted" style="margin-top:.6rem"></div>
+    </form>
+  </div>
+</main>
+<footer class="site-footer container">© <span id="year"></span> Mazvikadei Resort</footer>
+<script src="app.js"></script>
+</body></html>

@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Luxury Ocean Suite",
+    "price": 350,
+    "amenities": "King bed, Balcony, Free breakfast",
+    "image": "assets/rooms/ocean.jpg",
+    "available": 1
+  },
+  {
+    "id": 2,
+    "title": "Garden View Room",
+    "price": 160,
+    "amenities": "Queen bed, Garden view, Mini bar",
+    "image": "assets/rooms/garden.jpg",
+    "available": 1
+  },
+  {
+    "id": 3,
+    "title": "Family Villa",
+    "price": 480,
+    "amenities": "2 Bedrooms, Private pool",
+    "image": "assets/rooms/villa.jpg",
+    "available": 1
+  }
+]

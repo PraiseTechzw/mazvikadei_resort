@@ -1,0 +1,108 @@
+<!doctype html><html lang="en"><head><meta charset='utf-8'/><meta name='viewport' content='width=device-width,initial-scale=1'/><title>Bookings - Mazvikadei Resort</title><link rel='stylesheet' href='styles.css'/></head><body>
+<header class="site-header"><div class="container header-inner"><div class="brand"><img src="assets/logo.svg" style="height:42px;margin-right:.6rem;vertical-align:middle">Mazvikadei Resort</div><nav class="nav"><a href="index.html">Home</a><a href="rooms.html">Rooms</a><a href="activities.html">Activities</a><a href="events.html">Events</a><a href="bookings.html" class="active">Bookings</a></nav></div></header>
+<main class="container">
+  <h1>Make a Booking</h1>
+  <p class="muted">Centralized page for room, activity or event booking.</p>
+  <div class="card">
+    <h3>Chosen Items</h3>
+    <div id="chosenList" class="muted">No items selected. Use Rooms or Activities pages to add items.</div>
+  </div>
+
+  <div class="card" style="margin-top:1rem">
+    <h3>Your Details</h3>
+    <form id="checkoutForm">
+      <div class="form-row"><input name="fullname" required placeholder="Full name"></div>
+      <div class="form-row"><input name="email" type="email" required placeholder="Email"></div>
+      <div class="form-row"><input name="phone" placeholder="Phone"></div>
+      <div style="margin-top:.6rem"><button class="btn primary">Place Booking</button></div>
+      <div id="checkoutStatus" class="muted" style="margin-top:.6rem"></div>
+    </form>
+  </div>
+</main>
+<footer class="site-footer container">© <span id="year"></span> Mazvikadei Resort</footer>
+<script src="app.js"></script>
+<!-- ===== BOOKING FORM ===== -->
+<form id="bookingForm">
+  <label>
+    Name: <input type="text" id="customerName" required>
+  </label><br><br>
+
+  <label>
+    Room Type:
+    <select id="roomType" required>
+      <option value="Standard">Standard ($40)</option>
+      <option value="Deluxe">Deluxe ($60)</option>
+      <option value="Lake View">Lake View ($90)</option>
+      ,<option value="research">Reasearch Lab</option>
+    </select>
+  </label><br><br>
+
+  <label>
+    Nights: <input type="number" id="nights" value="1" min="1" required>
+  </label><br><br>
+
+  <button type="button" onclick="showPayment()">Next: Pay Now</button>
+</form>
+
+<!-- ===== MOCK PAYMENT SECTION ===== -->
+<div id="paymentSection" style="display:none; margin-top:20px; text-align:center;">
+  <h3>Proceed to Payment</h3>
+  <p>Booking Amount: <strong id="amountDisplay">USD 0</strong></p>
+  <button onclick="mockPay()" style="background:#00b894; color:white; padding:10px 25px; border:none; border-radius:8px; cursor:pointer;">
+    Pay Now with Paynow
+  </button>
+  <p id="payment-status" style="margin-top:15px; font-weight:bold; color:#2d3436;"></p>
+</div>
+
+<script>
+  // Room prices
+  const prices = {
+    "Standard": 40,
+    "Deluxe": 60,
+    "Lake View": 90
+  };
+
+  function showPayment() {
+    // Get form values
+    const name = document.getElementById('customerName').value.trim();
+    const room = document.getElementById('roomType').value;
+    const nights = parseInt(document.getElementById('nights').value);
+
+    if (!name || !room || nights < 1) {
+      alert("Please fill all fields correctly!");
+      return;
+    }
+
+    // Calculate total
+    const total = prices[room] * nights;
+
+    // Store values in localStorage for confirmation page
+    localStorage.setItem('customerName', name);
+    localStorage.setItem('roomType', room);
+    localStorage.setItem('nights', nights);
+    localStorage.setItem('amount', total);
+
+    // Update amount display
+    document.getElementById('amountDisplay').textContent = "USD " + total.toFixed(2);
+
+    // Show payment section
+    document.getElementById('paymentSection').style.display = 'block';
+
+    // Scroll to payment section
+    document.getElementById('paymentSection').scrollIntoView({behavior: "smooth"});
+  }
+
+  function mockPay() {
+    const status = document.getElementById("payment-status");
+    status.style.color = "#00b894";
+    status.textContent = "Processing payment...";
+
+    setTimeout(() => {
+      status.textContent = "✅ Payment successful! Redirecting...";
+      setTimeout(() => {
+        window.location.href = "confirm.html"; // redirect to confirmation page
+      }, 1500);
+    }, 2000);
+  }
+</script>
+</body></html>

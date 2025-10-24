@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mazvikadei Resort</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand"><img src="assets/logo.jpg" style="height:42px;margin-right:.6rem;vertical-align:middle">Mazvikadei Resort</div>
+      <nav class="nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="rooms.html">Rooms</a>
+        <a href="activities.html">Activities</a>
+        <a href="events.html">Events</a>
+        <a href="bookings.html">Bookings</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="admin/login.php">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card hero">
+      <div class="hero-left">
+        <h1>Welcome to Mazvikadei Resort</h1>
+        <p class="lead">A place for relaxation, adventure, and unforgettable events. Book rooms, activities, or venues — tailored for you.</p>
+        <p><a class="btn primary" href="rooms.html">Browse Rooms</a></p>
+      </div>
+      <div class="hero-media">
+        <div id="slideshow" style="width:360px;height:220px;border-radius:10px;overflow:hidden"></div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="feature card"><h3>Beachfront</h3><p class="muted">Relax by the ocean.</p></div>
+      <div class="feature card"><h3>Activities</h3><p class="muted">Boat cruises, fishing, hikes and more.</p></div>
+      <div class="feature card"><h3>Events</h3><p class="muted">Weddings, retreats and conferences.</p></div>
+    </section>
+  </main>
+
+  <footer class="site-footer container">© <span id="year"></span> Mazvikadei Resort</footer>
+  <script src="app.js"></script>
+  <script>
+    // simple slideshow images
+    const slides = [
+      'assets/rooms/ocean.jpg',
+      'assets/rooms/garden.jpg',
+      'assets/rooms/villa.jpg'
+    ];
+    const slideEl = document.getElementById('slideshow');
+    let si = 0;
+    function renderSlide(){
+      slideEl.style.backgroundImage = 'url(' + slides[si] + ')';
+      slideEl.style.backgroundSize = 'cover';
+      slideEl.style.backgroundPosition = 'center';
+      si = (si + 1) % slides.length;
+    }
+    renderSlide();
+    setInterval(renderSlide, 3000);
+  </script>
+ <!-- 🌴 Mazvikadei Resort Booking Chatbot -->
+<div id="chatbot-icon">💬</div>
+
+<div id="chatbot-box" class="hidden">
+  <div class="chat-header">
+    <span>Mazvikadei Assistant</span>
+    <button id="close-btn">&times;</button>
+  </div>
+  <div class="chat-messages" id="messages"></div>
+  <div class="chat-input">
+    <input id="userInput" placeholder="Ask about rooms, payments, or bookings...">
+    <button id="sendBtn">Send</button>
+  </div>
+</div>
+
+<style>
+  #chatbot-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #007bff;
+    color: white;
+    font-size: 24px;
+    padding: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+    z-index: 9999;
+  }
+  #chatbot-icon:hover { transform: scale(1.1); }
+
+  #chatbot-box {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9999;
+  }
+  #chatbot-box.hidden { display: none; }
+
+  .chat-header {
+    background: #007bff;
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chat-header button {
+    background: transparent;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .chat-messages {
+    height: 260px;
+    overflow-y: auto;
+    padding: 10px;
+    font-size: 14px;
+  }
+  .chat-messages div {
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .user { color: #007bff; font-weight: bold; }
+  .bot { color: #333; }
+
+  .chat-input {
+    display: flex;
+    border-top: 1px solid #ddd;
+  }
+  .chat-input input {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    outline: none;
+  }
+  .chat-input button {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const icon = document.getElementById("chatbot-icon");
+  const box = document.getElementById("chatbot-box");
+  const close = document.getElementById("close-btn");
+  const sendBtn = document.getElementById("sendBtn");
+  const messages = document.getElementById("messages");
+  const input = document.getElementById("userInput");
+
+  icon.onclick = () => box.classList.toggle("hidden");
+  close.onclick = () => box.classList.add("hidden");
+  sendBtn.onclick = sendMessage;
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
+
+ function addMessage(sender, text) {
+  const div = document.createElement("div");
+  div.innerHTML = `<span class="${sender}">${sender === "user" ? "You" : "Bot"}:</span> ${text}`;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+
+  function sendMessage() {
+    const msg = input.value.trim();
+    if (!msg) return;
+    addMessage("user", msg);
+    input.value = "";
+
+    const reply = generateReply(msg.toLowerCase());
+    setTimeout(() => addMessage("bot", reply), 500);
+  }
+
+  function generateReply(msg) {
+    // greetings
+    if (msg.includes("hello") || msg.includes("hi"))
+      return "Hello! 👋 Welcome to Mazvikadei Resort. How can I assist you today?";
+    if (msg.includes("help"))
+      return "Sure! You can ask me about room prices, booking, check-in times, payments, or activities.";
+    
+    // rooms and prices
+    if (msg.includes("room") || msg.includes("accommodation"))
+      return "We offer Standard Rooms ($40/night), Deluxe Rooms ($60/night), and Lake View Chalets ($90/night). Would you like to book one?";
+    
+    // booking
+    if (msg.includes("book") || msg.includes("reserve"))
+      return "To book a room, please visit the Booking section on our website or click 'Book Now'. What dates would you like to stay?";
+    
+    // check-in / check-out
+    if (msg.includes("check-in") || msg.includes("check in"))
+      return "Check-in time is from 2:00 PM, and check-out is before 10:00 AM.";
+    
+    // activities
+    if (msg.includes("activity") || msg.includes("activities") || msg.includes("fun"))
+      return "We offer boating, fishing, swimming, and nature walks! 🏖 Which one interests you most?";
+    
+    // location
+    if (msg.includes("where") || msg.includes("location") || msg.includes("map"))
+      return "Mazvikadei Resort is located near Banket, Zimbabwe, by the beautiful Mazvikadei Dam.";
+    
+    // payment
+    if (msg.includes("pay") || msg.includes("payment") || msg.includes("price"))
+      return "You can pay using EcoCash, Paynow, or PayPal. 💳 Which method would you like to use?";
+    
+    // cancellation
+    if (msg.includes("cancel"))
+      return "You can cancel bookings up to 48 hours before check-in for a full refund.";
+    
+    // goodbye
+    if (msg.includes("bye") || msg.includes("thank"))
+      return "You're welcome! 😊 Enjoy your stay at Mazvikadei Resort!";
+    
+    // default
+    return "I'm not sure about that — but you can ask me about booking, rooms, or activities.";
+  }
+
+  // welcome message
+  addMessage("bot", "👋 Hello! I'm the Mazvikadei Resort Assistant. How can I help you today?");
+});
+</script>
+
+ 
+</script>
+
+</body>
+</html>

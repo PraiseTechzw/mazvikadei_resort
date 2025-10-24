@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "title": "Boat Cruising",
+    "description": "Relaxing boat rides on the bay",
+    "duration": "2 hours",
+    "price": 50,
+    "schedule": "Daily 09:00, 15:00"
+  },
+  {
+    "id": 2,
+    "title": "Fishing",
+    "description": "Guided fishing trips with equipment",
+    "duration": "4 hours",
+    "price": 40,
+    "schedule": "Mon, Wed, Fri 07:00"
+  },
+  {
+    "id": 3,
+    "title": "Nature Walks",
+    "description": "Guided nature walks and hiking",
+    "duration": "3 hours",
+    "price": 20,
+    "schedule": "Daily 07:30"
+  },
+  {
+    "id": 4,
+    "title": "Swimming",
+    "description": "Resort pool and beach access",
+    "duration": "Flexible",
+    "price": 0,
+    "schedule": "All day"
+  },
+  {
+    "id": 5,
+    "title": "Picnics & Braais",
+    "description": "Picnic and braai packages for groups",
+    "duration": "3 hours",
+    "price": 80,
+    "schedule": "By booking"
+  },
+  {
+    "id": 6,
+    "title": "Team Building",
+    "description": "Corporate team building activities",
+    "duration": "Half-day",
+    "price": 120,
+    "schedule": "By arrangement"
+  },
+  {
+    "id": 7,
+    "title": "Camping",
+    "description": "Overnight camping experiences",
+    "duration": "Overnight",
+    "price": 30,
+    "schedule": "Weekends"
+  }
+]

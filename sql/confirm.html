@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmation - Mazvikadei Resort</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .confirm-box {
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 350px;
+    }
+    h2 { color: #00b894; }
+    p { color: #333; margin-top: 10px; }
+    a {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      background: #00b894;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+    a:hover { background: #019874; }
+  </style>
+</head>
+<body>
+  <div class="confirm-box">
+    <h2>✅ Payment Successful</h2>
+    <p>Thank you for booking with <strong>Mazvikadei Resort</strong>!</p>
+    <p id="bookingDetails"></p>
+    <a href="booking.html">Back to Booking</a>
+    
+  </div>
+
+  <script>
+    // Load data from localStorage
+    const name = localStorage.getItem('customerName') || 'Guest';
+    const room = localStorage.getItem('roomType') || 'Room';
+    const nights = localStorage.getItem('nights') || 1;
+    const amount = localStorage.getItem('amount') || 0;
+
+    document.getElementById('bookingDetails').innerHTML =
+      `Name: <strong>${name}</strong><br>
+       Room Type: <strong>${room}</strong><br>
+       Nights: <strong>${nights}</strong><br>
+       Total Paid: <strong>USD ${amount}</strong>`;
+  </script>
+</body>
+</html>
