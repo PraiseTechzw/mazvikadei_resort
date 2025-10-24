@@ -12,6 +12,13 @@ if ($booking_ref) {
         $stmt = $pdo->prepare("SELECT * FROM bookings WHERE booking_reference = ?");
         $stmt->execute([$booking_ref]);
         $booking_data = $stmt->fetch();
+        
+        // Get payment details if booking exists
+        if ($booking_data) {
+            $stmt = $pdo->prepare("SELECT * FROM payments WHERE booking_id = ? ORDER BY created_at DESC LIMIT 1");
+            $stmt->execute([$booking_data['id']]);
+            $payment_data = $stmt->fetch();
+        }
     } catch (Exception $e) {
         // Handle error
     }
@@ -218,6 +225,33 @@ if ($booking_ref) {
                         <span class="detail-label">Status:</span>
                         <span class="detail-value" style="color: #059669; font-weight: 600;"><?php echo ucfirst($booking_data['status']); ?></span>
                     </div>
+                    
+                    <?php if (isset($payment_data) && $payment_data): ?>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Status:</span>
+                        <span class="detail-value" style="color: #059669; font-weight: 600;"><?php echo ucfirst($payment_data['status']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Method:</span>
+                        <span class="detail-value"><?php echo ucfirst(str_replace('_', ' ', $payment_data['payment_method'])); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Reference:</span>
+                        <span class="detail-value" style="font-family: monospace;"><?php echo htmlspecialchars($payment_data['payment_reference']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Transaction ID:</span>
+                        <span class="detail-value" style="font-family: monospace;"><?php echo htmlspecialchars($payment_data['transaction_id']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Amount Paid:</span>
+                        <span class="detail-value" style="color: #059669; font-weight: 600;">$<?php echo number_format($payment_data['amount'], 2); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Date:</span>
+                        <span class="detail-value"><?php echo date('F j, Y \a\t g:i A', strtotime($payment_data['processed_at'])); ?></span>
+                    </div>
+                    <?php endif; ?>
                     <?php if ($booking_data['check_in_date']): ?>
                     <div class="detail-row">
                         <span class="detail-label">Check-in:</span>

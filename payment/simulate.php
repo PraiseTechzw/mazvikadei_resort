@@ -579,7 +579,7 @@ if (!$method_info) {
             }, 1500);
         }
         
-        function completePayment() {
+        async function completePayment() {
             const paymentStatus = document.getElementById('paymentStatus');
             const payButton = document.getElementById('payButton');
             
@@ -590,18 +590,65 @@ if (!$method_info) {
                 step.classList.add('completed');
             });
             
-            // Show success status
-            paymentStatus.className = 'payment-status status-success';
-            paymentStatus.innerHTML = '<i class="fas fa-check-circle"></i> Payment successful! Redirecting...';
+            // Show processing status
+            paymentStatus.className = 'payment-status status-processing';
+            paymentStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizing payment...';
             
-            // Update button
-            payButton.innerHTML = '<i class="fas fa-check"></i> Payment Complete';
-            payButton.style.background = '#059669';
-            
-            // Redirect to confirmation page
-            setTimeout(() => {
-                window.location.href = '../booking_confirmation.php?ref=<?php echo $booking['booking_reference']; ?>';
-            }, 2000);
+            try {
+                // Process actual payment
+                const response = await fetch('process_payment.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        booking_id: <?php echo $booking['id']; ?>,
+                        payment_method: '<?php echo $payment_method; ?>',
+                        amount: <?php echo $booking['total_amount']; ?>
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Show success status
+                    paymentStatus.className = 'payment-status status-success';
+                    paymentStatus.innerHTML = `
+                        <i class="fas fa-check-circle"></i> Payment successful!<br>
+                        <small>Reference: ${result.payment_reference}</small>
+                    `;
+                    
+                    // Update button
+                    payButton.innerHTML = '<i class="fas fa-check"></i> Payment Complete';
+                    payButton.style.background = '#059669';
+                    
+                    // Redirect to confirmation page
+                    setTimeout(() => {
+                        window.location.href = '../booking_confirmation.php?ref=<?php echo $booking['booking_reference']; ?>';
+                    }, 2000);
+                } else {
+                    // Show error status
+                    paymentStatus.className = 'payment-status status-error';
+                    paymentStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> Payment failed: ${result.message}`;
+                    
+                    // Reset button
+                    payButton.disabled = false;
+                    payButton.innerHTML = '<i class="fas fa-credit-card"></i> Try Again';
+                    payButton.style.background = '#dc2626';
+                }
+                
+            } catch (error) {
+                console.error('Payment processing error:', error);
+                
+                // Show error status
+                paymentStatus.className = 'payment-status status-error';
+                paymentStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Payment processing failed. Please try again.';
+                
+                // Reset button
+                payButton.disabled = false;
+                payButton.innerHTML = '<i class="fas fa-credit-card"></i> Try Again';
+                payButton.style.background = '#dc2626';
+            }
         }
         
         // Add some interactive effects

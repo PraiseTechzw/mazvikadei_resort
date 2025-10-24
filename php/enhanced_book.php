@@ -76,8 +76,8 @@ try {
             booking_reference, type, items_json, customer_id, customer_name, 
             customer_email, customer_phone, check_in_date, check_out_date,
             total_amount, deposit_amount, balance_amount, extras, special_requests, 
-            attachment, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            attachment, status, payment_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ');
     
     $stmt->execute([
@@ -85,7 +85,7 @@ try {
         $customer_id, $customer['fullname'], $customer['email'], 
         $customer['phone'] ?? '', $check_in_date, $check_out_date,
         $total_amount, $deposit_amount, $balance_amount, $extras, 
-        $special_requests, $attachment, 'pending'
+        $special_requests, $attachment, 'pending', 'pending'
     ]);
     
     $booking_id = $pdo->lastInsertId();

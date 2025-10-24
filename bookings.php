@@ -14,20 +14,28 @@ if (isset($_GET['data'])) {
     $booking_data = json_decode($_GET['data'], true);
 }
 
-// Get rooms, activities, and events for selection
+// Get user details from database
+$user_details = null;
 try {
     $pdo = getPDO();
     
-    $stmt = $pdo->query("SELECT * FROM rooms WHERE status = 'available' ORDER BY price ASC");
+    // Get user information
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user_details = $stmt->fetch();
+    
+    // Get rooms, activities, and events for selection
+    $stmt = $pdo->query("SELECT * FROM rooms WHERE available = 1 ORDER BY price ASC");
     $rooms = $stmt->fetchAll();
     
-    $stmt = $pdo->query("SELECT * FROM activities WHERE status = 'active' ORDER BY price ASC");
+    $stmt = $pdo->query("SELECT * FROM activities WHERE available = 1 ORDER BY price ASC");
     $activities = $stmt->fetchAll();
     
-    $stmt = $pdo->query("SELECT * FROM events WHERE status = 'active' ORDER BY price ASC");
+    $stmt = $pdo->query("SELECT * FROM events WHERE available = 1 ORDER BY price ASC");
     $events = $stmt->fetchAll();
     
 } catch (Exception $e) {
+    $user_details = null;
     $rooms = [];
     $activities = [];
     $events = [];
@@ -66,6 +74,52 @@ try {
             padding: 2rem;
             margin-bottom: 2rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .user-info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .user-info-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .user-info-header i {
+            font-size: 2rem;
+        }
+        
+        .user-info-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .user-info-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .user-info-details p {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .user-info-details i {
+            width: 16px;
+            text-align: center;
         }
         .step-header {
             display: flex;
@@ -458,19 +512,38 @@ try {
                     <div class="step-number">2</div>
                     <div class="step-title">Your Details</div>
                 </div>
+                
+                <?php if ($user_details): ?>
+                <div class="user-info-card">
+                    <div class="user-info-header">
+                        <i class="fas fa-user-circle"></i>
+                        <h3>Welcome back, <?php echo htmlspecialchars($user_details['name']); ?>!</h3>
+                    </div>
+                    <div class="user-info-details">
+                        <p><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($user_details['email']); ?></p>
+                        <?php if ($user_details['phone']): ?>
+                        <p><i class="fas fa-phone"></i> <?php echo htmlspecialchars($user_details['phone']); ?></p>
+                        <?php endif; ?>
+                        <p><i class="fas fa-calendar"></i> Member since <?php echo date('F Y', strtotime($user_details['created_at'])); ?></p>
+                    </div>
+                </div>
+                <?php endif; ?>
                 <form id="customerForm">
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="fullname">Full Name *</label>
-                            <input type="text" id="fullname" name="fullname" required>
+                            <input type="text" id="fullname" name="fullname" 
+                                   value="<?php echo htmlspecialchars($user_details['name'] ?? ''); ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="email">Email Address *</label>
-                            <input type="email" id="email" name="email" required>
+                            <input type="email" id="email" name="email" 
+                                   value="<?php echo htmlspecialchars($user_details['email'] ?? ''); ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone">
+                            <input type="tel" id="phone" name="phone" 
+                                   value="<?php echo htmlspecialchars($user_details['phone'] ?? ''); ?>">
                         </div>
                         <div class="form-group">
                             <label for="guests">Number of Guests</label>
@@ -555,8 +628,35 @@ try {
         let selectedItems = [];
         let selectedPaymentMethod = null;
 
+        // Load user details and populate form
+        async function loadUserDetails() {
+            try {
+                const response = await fetch('php/api/user_details.php');
+                const data = await response.json();
+                
+                if (data.user) {
+                    // Update form fields with user data
+                    document.getElementById('fullname').value = data.user.name || '';
+                    document.getElementById('email').value = data.user.email || '';
+                    document.getElementById('phone').value = data.user.phone || '';
+                    
+                    // Update user info card if it exists
+                    const userInfoCard = document.querySelector('.user-info-card');
+                    if (userInfoCard) {
+                        const welcomeText = userInfoCard.querySelector('h3');
+                        if (welcomeText) {
+                            welcomeText.textContent = `Welcome back, ${data.user.name}!`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user details:', error);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             loadSelectedItems();
+            loadUserDetails();
             setupPaymentMethods();
             setupItemSelection();
             setDefaultDates();
