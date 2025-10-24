@@ -74,3 +74,4 @@ try {
     echo json_encode(['error' => 'database_error', 'message' => $e->getMessage()]);
 }
 ?>
+

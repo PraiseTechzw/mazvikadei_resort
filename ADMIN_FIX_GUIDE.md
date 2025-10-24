@@ -80,3 +80,4 @@ If issues persist, check:
 2. PHP error logs
 3. Web server configuration
 4. File permissions
+

@@ -166,3 +166,4 @@ const response = await fetch('process_payment.php', {
    - Payment reports
 
 The payment system is now fully integrated with the booking system and provides a complete payment processing experience! 🎉
+

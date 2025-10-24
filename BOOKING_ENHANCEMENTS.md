@@ -114,3 +114,4 @@ async function loadUserDetails() {
 5. **Ensure booking submission works with user data**
 
 The booking system now provides a seamless, personalized experience for logged-in users! 🎉
+
