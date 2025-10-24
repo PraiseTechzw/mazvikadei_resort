@@ -12,35 +12,48 @@ $error_message = '';
 $success_message = '';
 
 if ($_POST) {
-    $email = $_POST['email'] ?? '';
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+    $admin_key = $_POST['admin_key'] ?? '';
     
-    if (empty($email) || empty($password)) {
+    // Validation
+    if (empty($name) || empty($email) || empty($password) || empty($confirm_password) || empty($admin_key)) {
         $error_message = 'Please fill in all fields.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error_message = 'Please enter a valid email address.';
+    } elseif (strlen($password) < 8) {
+        $error_message = 'Password must be at least 8 characters long.';
+    } elseif ($password !== $confirm_password) {
+        $error_message = 'Passwords do not match.';
+    } elseif ($admin_key !== 'MAZVIKADEI_ADMIN_2024') {
+        $error_message = 'Invalid admin registration key.';
     } else {
         try {
             $pdo = getPDO();
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = 'admin' AND status = 'active'");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
             
-            if ($user && password_verify($password, $user['password_hash'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_name'] = $user['name'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_role'] = $user['role'];
-                
-                // Log admin login
-                $log_stmt = $pdo->prepare("INSERT INTO admin_logs (admin_id, action, ip_address, user_agent) VALUES (?, 'login', ?, ?)");
-                $log_stmt->execute([$user['id'], $_SERVER['REMOTE_ADDR'] ?? '', $_SERVER['HTTP_USER_AGENT'] ?? '']);
-                
-                header('Location: enhanced_dashboard.php');
-                exit;
+            // Check if email already exists
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            if ($stmt->fetch()) {
+                $error_message = 'An account with this email already exists.';
             } else {
-                $error_message = 'Invalid admin credentials.';
+                // Create new admin user
+                $password_hash = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("
+                    INSERT INTO users (name, email, password_hash, role, status, created_at) 
+                    VALUES (?, ?, ?, 'admin', 'active', NOW())
+                ");
+                $stmt->execute([$name, $email, $password_hash]);
+                
+                $success_message = 'Admin account created successfully! You can now login.';
+                
+                // Clear form data
+                $_POST = [];
             }
         } catch (Exception $e) {
-            $error_message = 'Login failed. Please try again.';
+            $error_message = 'Registration failed. Please try again.';
         }
     }
 }
@@ -50,7 +63,7 @@ if ($_POST) {
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Admin Login - Mazvikadei Resort</title>
+    <title>Admin Registration - Mazvikadei Resort</title>
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
@@ -87,7 +100,7 @@ if ($_POST) {
                 0 25px 50px rgba(0, 0, 0, 0.15),
                 0 0 0 1px rgba(255, 255, 255, 0.2);
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             animation: adminSlideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             z-index: 1;
@@ -172,7 +185,7 @@ if ($_POST) {
         }
         
         .form-group {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             position: relative;
         }
         
@@ -216,7 +229,17 @@ if ($_POST) {
             transform: translateY(-2px);
         }
         
-        .btn-admin-login {
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .strength-weak { color: #dc2626; }
+        .strength-medium { color: #f59e0b; }
+        .strength-strong { color: #10b981; }
+        
+        .btn-admin-register {
             width: 100%;
             padding: 1.25rem;
             background: linear-gradient(135deg, #1e3a8a, #3b82f6);
@@ -233,16 +256,16 @@ if ($_POST) {
             letter-spacing: 0.5px;
         }
         
-        .btn-admin-login:hover {
+        .btn-admin-register:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 35px rgba(30, 58, 138, 0.4);
         }
         
-        .btn-admin-login:active {
+        .btn-admin-register:active {
             transform: translateY(-1px);
         }
         
-        .btn-admin-login::before {
+        .btn-admin-register::before {
             content: '';
             position: absolute;
             top: 0;
@@ -253,7 +276,7 @@ if ($_POST) {
             transition: left 0.6s;
         }
         
-        .btn-admin-login:hover::before {
+        .btn-admin-register:hover::before {
             left: 100%;
         }
         
@@ -268,10 +291,32 @@ if ($_POST) {
             font-weight: 600;
         }
         
+        .success-message {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #10b981;
+            animation: adminSlideIn 0.6s ease-in-out;
+            font-weight: 600;
+        }
+        
         @keyframes adminShake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-8px); }
             75% { transform: translateX(8px); }
+        }
+        
+        @keyframes adminSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .admin-links {
@@ -368,13 +413,13 @@ if ($_POST) {
     <div class="admin-container">
         <div class="admin-header">
             <div class="admin-logo">
-                <i class="fas fa-shield-alt"></i>
+                <i class="fas fa-user-plus"></i>
             </div>
-            <h1 class="admin-title">Admin Portal</h1>
-            <p class="admin-subtitle">Secure Access Required</p>
+            <h1 class="admin-title">Admin Registration</h1>
+            <p class="admin-subtitle">Create New Admin Account</p>
             <div class="admin-badge">
-                <i class="fas fa-lock"></i>
-                Authorized Personnel Only
+                <i class="fas fa-shield-alt"></i>
+                Authorized Access Only
             </div>
         </div>
         
@@ -385,11 +430,28 @@ if ($_POST) {
         </div>
         <?php endif; ?>
         
-        <form method="POST" action="login.php">
+        <?php if ($success_message): ?>
+        <div class="success-message">
+            <i class="fas fa-check-circle"></i>
+            <?php echo htmlspecialchars($success_message); ?>
+        </div>
+        <?php endif; ?>
+        
+        <form method="POST" action="register.php">
             <div class="form-group">
-                <label for="email">Admin Email</label>
+                <label for="name">Full Name</label>
                 <div class="input-wrapper">
-                    <i class="fas fa-user-shield"></i>
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="name" name="name" class="form-control" 
+                           placeholder="Enter your full name" required 
+                           value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
                     <input type="email" id="email" name="email" class="form-control" 
                            placeholder="Enter admin email" required 
                            value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
@@ -397,28 +459,43 @@ if ($_POST) {
             </div>
             
             <div class="form-group">
-                <label for="password">Admin Password</label>
+                <label for="password">Password</label>
                 <div class="input-wrapper">
-                    <i class="fas fa-key"></i>
+                    <i class="fas fa-lock"></i>
                     <input type="password" id="password" name="password" class="form-control" 
-                           placeholder="Enter admin password" required>
+                           placeholder="Enter secure password" required>
+                </div>
+                <div class="password-strength" id="passwordStrength"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" 
+                           placeholder="Confirm your password" required>
                 </div>
             </div>
             
-            <button type="submit" class="btn-admin-login">
-                <i class="fas fa-sign-in-alt"></i>
-                Access Admin Panel
+            <div class="form-group">
+                <label for="admin_key">Admin Registration Key</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-key"></i>
+                    <input type="text" id="admin_key" name="admin_key" class="form-control" 
+                           placeholder="Enter admin registration key" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-admin-register">
+                <i class="fas fa-user-plus"></i>
+                Create Admin Account
             </button>
         </form>
         
         <div class="admin-links">
-            <a href="register.php">
-                <i class="fas fa-user-plus"></i>
-                Create Admin Account
-            </a>
-            <a href="forgot-password.php">
-                <i class="fas fa-key"></i>
-                Reset Password
+            <a href="login.php">
+                <i class="fas fa-sign-in-alt"></i>
+                Back to Login
             </a>
             <a href="../index.php">
                 <i class="fas fa-home"></i>
@@ -428,15 +505,77 @@ if ($_POST) {
         
         <div class="security-notice">
             <i class="fas fa-shield-alt"></i>
-            This is a secure admin area. All activities are logged and monitored.
+            Admin registration requires a valid registration key. Contact system administrator for access.
         </div>
     </div>
     
     <script>
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthDiv = document.getElementById('passwordStrength');
+            
+            if (password.length === 0) {
+                strengthDiv.innerHTML = '';
+                return;
+            }
+            
+            let strength = 0;
+            let feedback = [];
+            
+            if (password.length >= 8) strength++;
+            else feedback.push('at least 8 characters');
+            
+            if (/[a-z]/.test(password)) strength++;
+            else feedback.push('lowercase letters');
+            
+            if (/[A-Z]/.test(password)) strength++;
+            else feedback.push('uppercase letters');
+            
+            if (/[0-9]/.test(password)) strength++;
+            else feedback.push('numbers');
+            
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            else feedback.push('special characters');
+            
+            let strengthText = '';
+            let strengthClass = '';
+            
+            if (strength < 3) {
+                strengthText = 'Weak password. Add: ' + feedback.join(', ');
+                strengthClass = 'strength-weak';
+            } else if (strength < 5) {
+                strengthText = 'Medium strength password';
+                strengthClass = 'strength-medium';
+            } else {
+                strengthText = 'Strong password!';
+                strengthClass = 'strength-strong';
+            }
+            
+            strengthDiv.innerHTML = `<i class="fas fa-shield-alt"></i> ${strengthText}`;
+            strengthDiv.className = `password-strength ${strengthClass}`;
+        });
+        
+        // Password confirmation checker
+        document.getElementById('confirm_password').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword.length > 0) {
+                if (password === confirmPassword) {
+                    this.style.borderColor = '#10b981';
+                } else {
+                    this.style.borderColor = '#dc2626';
+                }
+            } else {
+                this.style.borderColor = '#e2e8f0';
+            }
+        });
+        
         // Add loading animation to form submission
         document.querySelector('form').addEventListener('submit', function() {
-            const btn = document.querySelector('.btn-admin-login');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            const btn = document.querySelector('.btn-admin-register');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
             btn.disabled = true;
         });
         
@@ -449,20 +588,6 @@ if ($_POST) {
             input.addEventListener('blur', function() {
                 this.parentElement.style.transform = 'scale(1)';
             });
-        });
-        
-        // Add security warning for failed attempts
-        let failedAttempts = 0;
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            if (!email || !password) {
-                failedAttempts++;
-                if (failedAttempts >= 3) {
-                    alert('Multiple failed login attempts detected. Please contact system administrator.');
-                }
-            }
         });
     </script>
 </body>

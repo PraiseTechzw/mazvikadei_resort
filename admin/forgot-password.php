@@ -12,35 +12,58 @@ $error_message = '';
 $success_message = '';
 
 if ($_POST) {
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $email = trim($_POST['email'] ?? '');
     
-    if (empty($email) || empty($password)) {
-        $error_message = 'Please fill in all fields.';
+    if (empty($email)) {
+        $error_message = 'Please enter your admin email address.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error_message = 'Please enter a valid email address.';
     } else {
         try {
             $pdo = getPDO();
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = 'admin' AND status = 'active'");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
             
-            if ($user && password_verify($password, $user['password_hash'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_name'] = $user['name'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_role'] = $user['role'];
+            // Check if admin exists
+            $stmt = $pdo->prepare("SELECT id, name, email FROM users WHERE email = ? AND role = 'admin' AND status = 'active'");
+            $stmt->execute([$email]);
+            $admin = $stmt->fetch();
+            
+            if ($admin) {
+                // Generate reset token
+                $reset_token = bin2hex(random_bytes(32));
+                $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
                 
-                // Log admin login
-                $log_stmt = $pdo->prepare("INSERT INTO admin_logs (admin_id, action, ip_address, user_agent) VALUES (?, 'login', ?, ?)");
-                $log_stmt->execute([$user['id'], $_SERVER['REMOTE_ADDR'] ?? '', $_SERVER['HTTP_USER_AGENT'] ?? '']);
+                // Store reset token
+                $stmt = $pdo->prepare("
+                    INSERT INTO password_resets (email, token, expires_at, created_at) 
+                    VALUES (?, ?, ?, NOW())
+                    ON DUPLICATE KEY UPDATE token = VALUES(token), expires_at = VALUES(expires_at), created_at = NOW()
+                ");
+                $stmt->execute([$email, $reset_token, $expires_at]);
                 
-                header('Location: enhanced_dashboard.php');
-                exit;
+                // Send reset email (placeholder - in production, use proper email service)
+                $reset_link = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . "/reset-password.php?token=" . $reset_token;
+                
+                // For demo purposes, we'll show the reset link
+                $success_message = "Password reset instructions have been sent to your email. For demo purposes, your reset link is: " . $reset_link;
+                
+                // In production, send actual email:
+                /*
+                $subject = "Password Reset - Mazvikadei Resort Admin";
+                $message = "Hello " . $admin['name'] . ",\n\n";
+                $message .= "You requested a password reset for your admin account.\n\n";
+                $message .= "Click the link below to reset your password:\n";
+                $message .= $reset_link . "\n\n";
+                $message .= "This link will expire in 1 hour.\n\n";
+                $message .= "If you didn't request this reset, please ignore this email.\n\n";
+                $message .= "Best regards,\nMazvikadei Resort Team";
+                
+                mail($email, $subject, $message);
+                */
             } else {
-                $error_message = 'Invalid admin credentials.';
+                $error_message = 'No admin account found with that email address.';
             }
         } catch (Exception $e) {
-            $error_message = 'Login failed. Please try again.';
+            $error_message = 'Password reset failed. Please try again.';
         }
     }
 }
@@ -50,7 +73,7 @@ if ($_POST) {
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Admin Login - Mazvikadei Resort</title>
+    <title>Forgot Password - Mazvikadei Resort Admin</title>
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
@@ -216,7 +239,7 @@ if ($_POST) {
             transform: translateY(-2px);
         }
         
-        .btn-admin-login {
+        .btn-admin-reset {
             width: 100%;
             padding: 1.25rem;
             background: linear-gradient(135deg, #1e3a8a, #3b82f6);
@@ -233,16 +256,16 @@ if ($_POST) {
             letter-spacing: 0.5px;
         }
         
-        .btn-admin-login:hover {
+        .btn-admin-reset:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 35px rgba(30, 58, 138, 0.4);
         }
         
-        .btn-admin-login:active {
+        .btn-admin-reset:active {
             transform: translateY(-1px);
         }
         
-        .btn-admin-login::before {
+        .btn-admin-reset::before {
             content: '';
             position: absolute;
             top: 0;
@@ -253,7 +276,7 @@ if ($_POST) {
             transition: left 0.6s;
         }
         
-        .btn-admin-login:hover::before {
+        .btn-admin-reset:hover::before {
             left: 100%;
         }
         
@@ -268,10 +291,33 @@ if ($_POST) {
             font-weight: 600;
         }
         
+        .success-message {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #10b981;
+            animation: adminSlideIn 0.6s ease-in-out;
+            font-weight: 600;
+            word-break: break-all;
+        }
+        
         @keyframes adminShake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-8px); }
             75% { transform: translateX(8px); }
+        }
+        
+        @keyframes adminSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .admin-links {
@@ -368,13 +414,13 @@ if ($_POST) {
     <div class="admin-container">
         <div class="admin-header">
             <div class="admin-logo">
-                <i class="fas fa-shield-alt"></i>
+                <i class="fas fa-key"></i>
             </div>
-            <h1 class="admin-title">Admin Portal</h1>
-            <p class="admin-subtitle">Secure Access Required</p>
+            <h1 class="admin-title">Reset Password</h1>
+            <p class="admin-subtitle">Enter your admin email to receive reset instructions</p>
             <div class="admin-badge">
-                <i class="fas fa-lock"></i>
-                Authorized Personnel Only
+                <i class="fas fa-shield-alt"></i>
+                Secure Password Reset
             </div>
         </div>
         
@@ -385,40 +431,34 @@ if ($_POST) {
         </div>
         <?php endif; ?>
         
-        <form method="POST" action="login.php">
+        <?php if ($success_message): ?>
+        <div class="success-message">
+            <i class="fas fa-check-circle"></i>
+            <?php echo htmlspecialchars($success_message); ?>
+        </div>
+        <?php endif; ?>
+        
+        <form method="POST" action="forgot-password.php">
             <div class="form-group">
-                <label for="email">Admin Email</label>
+                <label for="email">Admin Email Address</label>
                 <div class="input-wrapper">
-                    <i class="fas fa-user-shield"></i>
+                    <i class="fas fa-envelope"></i>
                     <input type="email" id="email" name="email" class="form-control" 
-                           placeholder="Enter admin email" required 
+                           placeholder="Enter your admin email" required 
                            value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
                 </div>
             </div>
             
-            <div class="form-group">
-                <label for="password">Admin Password</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-key"></i>
-                    <input type="password" id="password" name="password" class="form-control" 
-                           placeholder="Enter admin password" required>
-                </div>
-            </div>
-            
-            <button type="submit" class="btn-admin-login">
-                <i class="fas fa-sign-in-alt"></i>
-                Access Admin Panel
+            <button type="submit" class="btn-admin-reset">
+                <i class="fas fa-paper-plane"></i>
+                Send Reset Instructions
             </button>
         </form>
         
         <div class="admin-links">
-            <a href="register.php">
-                <i class="fas fa-user-plus"></i>
-                Create Admin Account
-            </a>
-            <a href="forgot-password.php">
-                <i class="fas fa-key"></i>
-                Reset Password
+            <a href="login.php">
+                <i class="fas fa-arrow-left"></i>
+                Back to Login
             </a>
             <a href="../index.php">
                 <i class="fas fa-home"></i>
@@ -428,15 +468,15 @@ if ($_POST) {
         
         <div class="security-notice">
             <i class="fas fa-shield-alt"></i>
-            This is a secure admin area. All activities are logged and monitored.
+            Password reset links expire in 1 hour for security.
         </div>
     </div>
     
     <script>
         // Add loading animation to form submission
         document.querySelector('form').addEventListener('submit', function() {
-            const btn = document.querySelector('.btn-admin-login');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            const btn = document.querySelector('.btn-admin-reset');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             btn.disabled = true;
         });
         
@@ -449,20 +489,6 @@ if ($_POST) {
             input.addEventListener('blur', function() {
                 this.parentElement.style.transform = 'scale(1)';
             });
-        });
-        
-        // Add security warning for failed attempts
-        let failedAttempts = 0;
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            if (!email || !password) {
-                failedAttempts++;
-                if (failedAttempts >= 3) {
-                    alert('Multiple failed login attempts detected. Please contact system administrator.');
-                }
-            }
         });
     </script>
 </body>

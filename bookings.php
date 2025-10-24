@@ -1,5 +1,12 @@
 <?php
+session_start();
 require_once 'php/config.php';
+
+// Check if user is logged in, redirect to login if not
+if (!isset($_SESSION['user_id'])) {
+    header('Location: auth/login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+    exit;
+}
 
 // Get booking data from localStorage (passed via JavaScript)
 $booking_data = null;

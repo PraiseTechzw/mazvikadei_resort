@@ -503,10 +503,12 @@ async function submitBooking() {
     }
     
     const formData = new FormData(form);
+    
+    // Get user information from session
     const customer = {
-        fullname: formData.get('fullname'),
-        email: formData.get('email'),
-        phone: formData.get('phone')
+        fullname: formData.get('fullname') || '',
+        email: formData.get('email') || '',
+        phone: formData.get('phone') || ''
     };
     
     const bookingData = {
@@ -556,69 +558,129 @@ async function submitBooking() {
  * Book room function
  */
 function bookRoom(roomId, title, price) {
-    const checkIn = document.getElementById('check_in')?.value;
-    const checkOut = document.getElementById('check_out')?.value;
-    const guests = document.getElementById('guests')?.value || 2;
-    
-    if (!checkIn || !checkOut) {
-        showNotification('Please select check-in and check-out dates.', 'warning');
-        return;
-    }
-    
-    const bookingData = {
-        type: 'room',
-        items: [{
-            id: roomId,
-            title: title,
-            price: price,
-            quantity: 1,
-            room_id: roomId
-        }],
-        check_in_date: checkIn,
-        check_out_date: checkOut,
-        guests: guests
-    };
-    
-    localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
-    window.location.href = 'bookings.php';
+    // Check if user is logged in
+    fetch('php/api/check_auth.php')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.logged_in) {
+                showNotification('Please login to make a booking.', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'auth/login.php?redirect=' + encodeURIComponent(window.location.href);
+                }, 2000);
+                return;
+            }
+            
+            const checkIn = document.getElementById('check_in')?.value;
+            const checkOut = document.getElementById('check_out')?.value;
+            const guests = document.getElementById('guests')?.value || 2;
+            
+            if (!checkIn || !checkOut) {
+                showNotification('Please select check-in and check-out dates.', 'warning');
+                return;
+            }
+            
+            const bookingData = {
+                type: 'room',
+                items: [{
+                    id: roomId,
+                    title: title,
+                    price: price,
+                    quantity: 1,
+                    room_id: roomId
+                }],
+                check_in_date: checkIn,
+                check_out_date: checkOut,
+                guests: guests
+            };
+            
+            localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
+            window.location.href = 'bookings.php';
+        })
+        .catch(error => {
+            console.error('Auth check failed:', error);
+            showNotification('Please login to make a booking.', 'warning');
+            setTimeout(() => {
+                window.location.href = 'auth/login.php?redirect=' + encodeURIComponent(window.location.href);
+            }, 2000);
+        });
 }
 
 /**
  * Book activity function
  */
 function bookActivity(activityId, title, price) {
-    const bookingData = {
-        type: 'activity',
-        items: [{
-            id: activityId,
-            title: title,
-            price: price,
-            quantity: 1,
-            activity_id: activityId
-        }]
-    };
-    
-    localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
-    window.location.href = 'bookings.php';
+    // Check if user is logged in
+    fetch('php/api/check_auth.php')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.logged_in) {
+                showNotification('Please login to make a booking.', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'auth/login.php?redirect=' + encodeURIComponent(window.location.href);
+                }, 2000);
+                return;
+            }
+            
+            const bookingData = {
+                type: 'activity',
+                items: [{
+                    id: activityId,
+                    title: title,
+                    price: price,
+                    quantity: 1,
+                    activity_id: activityId
+                }]
+            };
+            
+            localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
+            window.location.href = 'bookings.php';
+        })
+        .catch(error => {
+            console.error('Auth check failed:', error);
+            showNotification('Please login to make a booking.', 'warning');
+            setTimeout(() => {
+                window.location.href = 'auth/login.php?redirect=' + encodeURIComponent(window.location.href);
+            }, 2000);
+        });
 }
 
 /**
  * Book event function
  */
 function bookEvent(eventId, title, price) {
-    const bookingData = {
-        type: 'event',
-        items: [{
-            id: eventId,
-            title: title,
-            price: price,
-            quantity: 1,
-            event_id: eventId
-        }]
-    };
-    
-    localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
-    window.location.href = 'bookings.php';
+    // Check if user is logged in
+    fetch('php/api/check_auth.php')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.logged_in) {
+                showNotification('Please login to make a booking.', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'auth/login.php?redirect=' + encodeURIComponent(window.location.href);
+                }, 2000);
+                return;
+            }
+            
+            const bookingData = {
+                type: 'event',
+                items: [{
+                    id: eventId,
+                    title: title,
+                    price: price,
+                    quantity: 1,
+                    event_id: eventId
+                }]
+            };
+            
+            localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
+            window.location.href = 'bookings.php';
+        })
+        .catch(error => {
+            console.error('Auth check failed:', error);
+            showNotification('Please login to make a booking.', 'warning');
+            setTimeout(() => {
+                window.location.href = 'auth/login.php?redirect=' + encodeURIComponent(window.location.href);
+            }, 2000);
+        });
 }
 
 /**
@@ -915,4 +977,5 @@ window.submitBooking = submitBooking;
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.showNotification = showNotification;
+window.utils = utils;
 window.utils = utils;

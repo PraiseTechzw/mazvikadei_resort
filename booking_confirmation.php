@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'php/config.php';
 
 // Get booking reference from URL

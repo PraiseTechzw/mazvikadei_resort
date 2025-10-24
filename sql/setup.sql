@@ -9,7 +9,11 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash VARCHAR(255) NOT NULL,
   name VARCHAR(200),
   role ENUM('admin','customer') DEFAULT 'customer',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  status ENUM('active','inactive','suspended') DEFAULT 'active',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  last_login DATETIME NULL,
+  login_attempts INT DEFAULT 0,
+  locked_until DATETIME NULL
 );
 
 -- Rooms
@@ -55,9 +59,31 @@ CREATE TABLE IF NOT EXISTS bookings (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Password reset tokens
+CREATE TABLE IF NOT EXISTS password_resets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(200) NOT NULL,
+  token VARCHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_token (token),
+  INDEX idx_email (email)
+);
+
+-- Admin activity logs
+CREATE TABLE IF NOT EXISTS admin_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  admin_id INT NOT NULL,
+  action VARCHAR(100) NOT NULL,
+  ip_address VARCHAR(45),
+  user_agent TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Seed admin user (password: Admin@123)
-INSERT INTO users (email, password_hash, name, role)
-VALUES ('admin@mazvikadei.local', '$2y$10$CwTycUXWue0Thq9StjUM0uJ8eQ1K/3r4d8Y6p/6Q8VnZ8J7q6Ww6', 'Admin', 'admin')
+INSERT INTO users (email, password_hash, name, role, status)
+VALUES ('admin@mazvikadei.local', '$2y$10$UQAJPP.uRQ8a1aORK744Rux9oEdwUZKQqL6z4QcyWDDJGfSfbxK4K', 'Admin', 'admin', 'active')
 ON DUPLICATE KEY UPDATE email=email;
 
 -- Seed rooms and activities

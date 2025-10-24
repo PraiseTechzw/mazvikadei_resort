@@ -4,7 +4,8 @@ session_start();
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
-    header('Location: ../index.php');
+    $redirect = $_GET['redirect'] ?? '../index.php';
+    header('Location: ' . $redirect);
     exit;
 }
 
@@ -29,12 +30,12 @@ if ($_POST) {
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_role'] = $user['role'];
                 
-                // Redirect based on role
+                // Redirect based on role and redirect parameter
+                $redirect = $_GET['redirect'] ?? '../index.php';
                 if ($user['role'] === 'admin') {
-                    header('Location: ../admin/enhanced_dashboard.php');
-                } else {
-                    header('Location: ../index.php');
+                    $redirect = '../admin/enhanced_dashboard.php';
                 }
+                header('Location: ' . $redirect);
                 exit;
             } else {
                 $error_message = 'Invalid email or password.';

@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'php/config.php';
 
 // Get featured rooms
@@ -28,14 +29,18 @@ try {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         .hero-section {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.8)), url('assets/hero-bg.jpg');
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.85), rgba(118, 75, 162, 0.75)), url('assets/background.jpg');
             background-size: cover;
             background-position: center;
+            background-attachment: fixed;
             color: white;
-            padding: 6rem 0;
+            padding: 8rem 0;
             text-align: center;
             position: relative;
             overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
         }
         
         .hero-section::before {
@@ -56,31 +61,116 @@ try {
         }
         
         .hero-content h1 {
-            font-size: 4rem;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            background: linear-gradient(45deg, #fff, #f0f9ff);
+            font-size: 5rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            background: linear-gradient(45deg, #fff, #f0f9ff, #e0f2fe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: fadeInUp 1.2s ease-out;
+            line-height: 1.1;
         }
         
         .hero-content p {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             margin-bottom: 3rem;
             opacity: 0.95;
-            max-width: 600px;
+            max-width: 700px;
             margin-left: auto;
             margin-right: auto;
-            line-height: 1.6;
+            line-height: 1.7;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            animation: fadeInUp 1.4s ease-out;
+            font-weight: 300;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: fadeInUp 1s ease-out;
         }
         
         .hero-buttons {
             display: flex;
-            gap: 1.5rem;
+            gap: 2rem;
             justify-content: center;
             flex-wrap: wrap;
+            animation: fadeInUp 1.6s ease-out;
+        }
+        
+        .hero-btn {
+            padding: 1.25rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .hero-btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: 2px solid transparent;
+        }
+        
+        .hero-btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .hero-btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .hero-btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: 2px solid transparent;
+        }
+        
+        .hero-btn-success:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+        
+        .hero-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        .hero-btn:hover::before {
+            left: 100%;
         }
         
         .floating-elements {
@@ -97,31 +187,146 @@ try {
             position: absolute;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
+            animation: float 8s ease-in-out infinite;
+            backdrop-filter: blur(1px);
         }
         
         .floating-element:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            top: 20%;
-            left: 10%;
+            width: 100px;
+            height: 100px;
+            top: 15%;
+            left: 8%;
             animation-delay: 0s;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
         }
         
         .floating-element:nth-child(2) {
-            width: 120px;
-            height: 120px;
-            top: 60%;
-            right: 10%;
-            animation-delay: 2s;
+            width: 150px;
+            height: 150px;
+            top: 55%;
+            right: 8%;
+            animation-delay: 3s;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
         }
         
         .floating-element:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 25%;
+            left: 15%;
+            animation-delay: 6s;
+            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+        }
+        
+        .floating-element:nth-child(4) {
             width: 60px;
             height: 60px;
-            bottom: 20%;
-            left: 20%;
+            top: 30%;
+            right: 25%;
+            animation-delay: 2s;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+        }
+        
+        .floating-element:nth-child(5) {
+            width: 120px;
+            height: 120px;
+            bottom: 40%;
+            right: 15%;
             animation-delay: 4s;
+            background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+        }
+        
+        /* Statistics Section */
+        .stats-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 3rem 0;
+            margin-top: -2rem;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+        
+        .stat-item {
+            color: white;
+            animation: fadeInUp 1.8s ease-out;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #fff, #f0f9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .stat-label {
+            font-size: 1.125rem;
+            opacity: 0.9;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 3.5rem;
+            }
+            
+            .hero-content p {
+                font-size: 1.25rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-content p {
+                font-size: 1.125rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
             justify-content: center;
             flex-wrap: wrap;
@@ -358,14 +563,49 @@ try {
                 Mazvikadei Resort
             </div>
             <nav class="nav">
-                <a href="index.php" class="active">Home</a>
-                <a href="rooms.php">Rooms</a>
-                <a href="activities.php">Activities</a>
-                <a href="events.php">Events</a>
-                <a href="bookings.php">Bookings</a>
-                <a href="about.php">About</a>
-                <a href="contact.php">Contact</a>
-                <a href="admin/login.php">Admin</a>
+                <a href="index.php" class="active">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <a href="rooms.php">
+                    <i class="fas fa-bed"></i>
+                    Rooms
+                </a>
+                <a href="activities.php">
+                    <i class="fas fa-hiking"></i>
+                    Activities
+                </a>
+                <a href="events.php">
+                    <i class="fas fa-calendar-alt"></i>
+                    Events
+                </a>
+                <a href="bookings.php">
+                    <i class="fas fa-calendar-check"></i>
+                    Bookings
+                </a>
+                <a href="about.php">
+                    <i class="fas fa-info-circle"></i>
+                    About
+                </a>
+                <a href="contact.php">
+                    <i class="fas fa-envelope"></i>
+                    Contact
+                </a>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="auth/logout.php">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                <?php else: ?>
+                    <a href="auth/login.php">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </a>
+                <?php endif; ?>
+                <a href="admin/enhanced_dashboard.php">
+                    <i class="fas fa-cog"></i>
+                    Admin
+                </a>
             </nav>
         </div>
     </header>
@@ -376,24 +616,69 @@ try {
             <div class="floating-element"></div>
             <div class="floating-element"></div>
             <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
         </div>
         <div class="container">
             <div class="hero-content">
-                <h1><i class="fas fa-mountain"></i> Welcome to Mazvikadei Resort</h1>
-                <p>Experience luxury accommodation, exciting activities, and unforgettable events in the heart of Zimbabwe's natural beauty.</p>
+                <div class="hero-subtitle">
+                    <i class="fas fa-star"></i>
+                    Luxury Resort Experience
+                </div>
+                <h1>
+                    <i class="fas fa-mountain"></i> 
+                    Welcome to Mazvikadei Resort
+                </h1>
+                <p>Experience luxury accommodation, exciting activities, and unforgettable events in the heart of Zimbabwe's natural beauty. Your perfect getaway awaits with stunning views of Mazvikadei Dam.</p>
                 <div class="hero-buttons">
-                    <a href="rooms.php" class="btn btn-primary">
+                    <a href="rooms.php" class="hero-btn hero-btn-primary">
                         <i class="fas fa-bed"></i>
                         Explore Rooms
                     </a>
-                    <a href="activities.php" class="btn btn-outline">
+                    <a href="activities.php" class="hero-btn hero-btn-secondary">
                         <i class="fas fa-hiking"></i>
                         Activities
                     </a>
-                    <a href="bookings.php" class="btn btn-success">
+                    <a href="bookings.php" class="hero-btn hero-btn-success">
                         <i class="fas fa-calendar-check"></i>
                         Book Now
                     </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Luxury Rooms</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number">1000+</div>
+                        <div class="stat-label">Happy Guests</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-number">4.9</div>
+                        <div class="stat-label">Average Rating</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-number">365</div>
+                        <div class="stat-label">Days Open</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -551,6 +836,111 @@ try {
         
         // Set current year
         document.getElementById('year').textContent = new Date().getFullYear();
+        
+        // Enhanced home page interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parallax effect for hero section
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const heroSection = document.querySelector('.hero-section');
+                const floatingElements = document.querySelectorAll('.floating-element');
+                
+                if (heroSection) {
+                    heroSection.style.transform = `translateY(${scrolled * 0.3}px)`;
+                }
+                
+                floatingElements.forEach((element, index) => {
+                    const speed = 0.2 + (index * 0.1);
+                    element.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+            });
+            
+            // Animate statistics on scroll
+            const observerOptions = {
+                threshold: 0.5,
+                rootMargin: '0px 0px -100px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateNumbers(entry.target);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.stat-number').forEach(stat => {
+                observer.observe(stat);
+            });
+            
+            // Animate numbers
+            function animateNumbers(element) {
+                const finalNumber = element.textContent;
+                const isDecimal = finalNumber.includes('.');
+                const targetNumber = parseFloat(finalNumber);
+                const duration = 2000;
+                const startTime = performance.now();
+                
+                function updateNumber(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                    const currentNumber = targetNumber * easeOutQuart;
+                    
+                    if (isDecimal) {
+                        element.textContent = currentNumber.toFixed(1);
+                    } else {
+                        element.textContent = Math.floor(currentNumber) + '+';
+                    }
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(updateNumber);
+                    } else {
+                        element.textContent = finalNumber;
+                    }
+                }
+                
+                requestAnimationFrame(updateNumber);
+            }
+            
+            // Add hover effects to hero buttons
+            document.querySelectorAll('.hero-btn').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) scale(1.05)';
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+        
+        // Add ripple effect CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            .hero-btn {
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+                pointer-events: none;
+            }
+            
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

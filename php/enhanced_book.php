@@ -1,6 +1,14 @@
 <?php
+session_start();
 require_once __DIR__ . '/config.php';
 header('Content-Type: application/json; charset=utf-8');
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'unauthorized', 'message' => 'Please login to make a booking']);
+    exit;
+}
 
 $input = json_decode(file_get_contents('php://input'), true);
 if (!$input) { 
@@ -59,23 +67,8 @@ try {
     
     // Check if customer exists, if not create them
     $customer_id = null;
-    $stmt = $pdo->prepare('SELECT id FROM users WHERE email = ?');
-    $stmt->execute([$customer['email']]);
-    $existing_customer = $stmt->fetch();
-    
-    if ($existing_customer) {
-        $customer_id = $existing_customer['id'];
-    } else {
-        // Create new customer
-        $stmt = $pdo->prepare('INSERT INTO users (email, name, phone, role) VALUES (?, ?, ?, ?)');
-        $stmt->execute([
-            $customer['email'],
-            $customer['fullname'],
-            $customer['phone'] ?? '',
-            'customer'
-        ]);
-        $customer_id = $pdo->lastInsertId();
-    }
+    // Use session user ID since user is already logged in
+    $customer_id = $_SESSION['user_id'];
     
     // Insert booking
     $stmt = $pdo->prepare('
