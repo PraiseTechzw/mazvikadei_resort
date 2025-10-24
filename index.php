@@ -592,6 +592,10 @@ try {
                     Contact
                 </a>
                 <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="customer/dashboard.php">
+                        <i class="fas fa-user-circle"></i>
+                        My Dashboard
+                    </a>
                     <a href="auth/logout.php">
                         <i class="fas fa-sign-out-alt"></i>
                         Logout

@@ -303,6 +303,12 @@ try {
                 <a href="bookings.php">Bookings</a>
                 <a href="about.php">About</a>
                 <a href="contact.php">Contact</a>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="customer/dashboard.php">My Dashboard</a>
+                    <a href="auth/logout.php">Logout</a>
+                <?php else: ?>
+                    <a href="auth/login.php">Login</a>
+                <?php endif; ?>
                 <a href="admin/login.php">Admin</a>
             </nav>
         </div>
