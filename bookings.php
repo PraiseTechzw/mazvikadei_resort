@@ -613,7 +613,7 @@ try {
                     </div>
                 </div>
 
-                <button class="btn-primary" onclick="submitBooking()">
+                <button class="btn-primary" onclick="submitBooking()" id="completeBookingBtn">
                     Complete Booking
                 </button>
                 
@@ -846,16 +846,16 @@ try {
                 const result = await response.json();
                 
                 if (result.ok) {
-                    showStatus(`Booking successful! Your booking reference is: ${result.booking_reference}`, 'success');
+                    showStatus(`Booking created! Redirecting to payment...`, 'success');
                     
                     // Clear localStorage
                     localStorage.removeItem('pendingBooking');
                     selectedItems = [];
                     
-                    // Redirect to confirmation page after 3 seconds
+                    // Redirect to payment simulation page
                     setTimeout(() => {
-                        window.location.href = 'booking_confirmation.php?ref=' + result.booking_reference;
-                    }, 3000);
+                        window.location.href = `payment/simulate.php?booking_id=${result.booking_id}&method=${selectedPaymentMethod}`;
+                    }, 2000);
                 } else {
                     showStatus(`Booking failed: ${result.message || 'Unknown error'}`, 'error');
                 }
