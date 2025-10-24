@@ -25,29 +25,104 @@ try {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Mazvikadei Resort - Luxury Accommodation & Activities</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         .hero-section {
-            background: linear-gradient(135deg, rgba(8, 108, 107, 0.9), rgba(245, 158, 11, 0.8)), url('assets/hero-bg.jpg');
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.8)), url('assets/hero-bg.jpg');
             background-size: cover;
             background-position: center;
             color: white;
-            padding: 4rem 0;
+            padding: 6rem 0;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 1s ease-out;
+        }
+        
         .hero-content h1 {
-            font-size: 3rem;
+            font-size: 4rem;
             font-weight: 800;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #fff, #f0f9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
+        
         .hero-content p {
-            font-size: 1.25rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
         }
+        
         .hero-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-element:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-element:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+        
+        .floating-element:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -297,13 +372,28 @@ try {
 
     <!-- Hero Section -->
     <section class="hero-section">
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
         <div class="container">
             <div class="hero-content">
-                <h1>Welcome to Mazvikadei Resort</h1>
+                <h1><i class="fas fa-mountain"></i> Welcome to Mazvikadei Resort</h1>
                 <p>Experience luxury accommodation, exciting activities, and unforgettable events in the heart of Zimbabwe's natural beauty.</p>
                 <div class="hero-buttons">
-                    <a href="rooms.php" class="btn-hero btn-primary-hero">Explore Rooms</a>
-                    <a href="bookings.php" class="btn-hero btn-secondary-hero">Book Now</a>
+                    <a href="rooms.php" class="btn btn-primary">
+                        <i class="fas fa-bed"></i>
+                        Explore Rooms
+                    </a>
+                    <a href="activities.php" class="btn btn-outline">
+                        <i class="fas fa-hiking"></i>
+                        Activities
+                    </a>
+                    <a href="bookings.php" class="btn btn-success">
+                        <i class="fas fa-calendar-check"></i>
+                        Book Now
+                    </a>
                 </div>
             </div>
         </div>
@@ -317,23 +407,31 @@ try {
                 <p>Discover what makes our resort the perfect destination for your next getaway</p>
             </div>
             <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🏖️</div>
+                <div class="feature-card animate-fadeInUp">
+                    <div class="feature-icon">
+                        <i class="fas fa-umbrella-beach"></i>
+                    </div>
                     <h3>Beachfront Location</h3>
                     <p>Enjoy stunning views of Mazvikadei Dam with direct access to pristine beaches and water activities.</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🏨</div>
+                <div class="feature-card animate-fadeInUp" style="animation-delay: 0.2s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-bed"></i>
+                    </div>
                     <h3>Luxury Accommodation</h3>
                     <p>Stay in our beautifully appointed rooms and suites with modern amenities and breathtaking views.</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
+                <div class="feature-card animate-fadeInUp" style="animation-delay: 0.4s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-hiking"></i>
+                    </div>
                     <h3>Exciting Activities</h3>
                     <p>From boat cruising and fishing to nature walks and team building, we have activities for everyone.</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎉</div>
+                <div class="feature-card animate-fadeInUp" style="animation-delay: 0.6s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
                     <h3>Event Venues</h3>
                     <p>Host your special events, weddings, and corporate functions in our beautiful venues.</p>
                 </div>
@@ -349,16 +447,28 @@ try {
                 <p>Choose from our selection of comfortable and luxurious rooms</p>
             </div>
             <div class="rooms-grid">
-                <?php foreach ($featured_rooms as $room): ?>
-                <div class="room-card">
+                <?php foreach ($featured_rooms as $index => $room): ?>
+                <div class="room-card animate-fadeInUp" style="animation-delay: <?php echo $index * 0.2; ?>s;">
                     <img src="<?php echo htmlspecialchars($room['image'] ?? 'assets/rooms/default.jpg'); ?>" 
                          alt="<?php echo htmlspecialchars($room['title']); ?>" class="room-image"
                          onerror="this.src='assets/rooms/default.jpg'">
                     <div class="room-content">
-                        <h3 class="room-title"><?php echo htmlspecialchars($room['title']); ?></h3>
-                        <div class="room-price">$<?php echo number_format($room['price'], 2); ?>/night</div>
-                        <div class="room-amenities"><?php echo htmlspecialchars($room['amenities'] ?? 'Standard amenities'); ?></div>
-                        <button class="room-btn" onclick="bookRoom(<?php echo $room['id']; ?>)">Book Now</button>
+                        <h3 class="room-title">
+                            <i class="fas fa-bed"></i>
+                            <?php echo htmlspecialchars($room['title']); ?>
+                        </h3>
+                        <div class="room-price">
+                            <i class="fas fa-dollar-sign"></i>
+                            $<?php echo number_format($room['price'], 2); ?>/night
+                        </div>
+                        <div class="room-amenities">
+                            <i class="fas fa-star"></i>
+                            <?php echo htmlspecialchars($room['amenities'] ?? 'Standard amenities'); ?>
+                        </div>
+                        <button class="room-btn" onclick="bookRoom(<?php echo $room['id']; ?>)">
+                            <i class="fas fa-calendar-check"></i>
+                            Book Now
+                        </button>
                     </div>
                 </div>
                 <?php endforeach; ?>

@@ -1,29 +1,52 @@
 /* Enhanced Mazvikadei Resort Styles */
 :root {
-    --primary: #086c6b;
-    --primary-light: #0ea5e9;
+    /* Beautiful Gradient Theme */
+    --primary: #667eea;
+    --primary-light: #7c3aed;
+    --primary-dark: #5a67d8;
+    --secondary: #764ba2;
     --accent: #f59e0b;
     --accent-light: #fbbf24;
-    --success: #059669;
-    --success-light: #10b981;
-    --danger: #dc2626;
-    --danger-light: #ef4444;
-    --warning: #d97706;
+    --success: #10b981;
+    --success-light: #34d399;
+    --danger: #ef4444;
+    --danger-light: #f87171;
+    --warning: #f59e0b;
     --info: #3b82f6;
     --muted: #6b7280;
     --muted-light: #9ca3af;
+    
+    /* Background Colors */
     --bg: #f8fafc;
     --bg-light: #ffffff;
-    --text: #0f1724;
+    --bg-dark: #1f2937;
+    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --bg-gradient-light: linear-gradient(135deg, #667eea20, #764ba220);
+    
+    /* Text Colors */
+    --text: #1f2937;
     --text-light: #374151;
+    --text-muted: #6b7280;
+    
+    /* Border and Shadow */
     --border: #e5e7eb;
     --border-light: #f3f4f6;
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 8px 15px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.1);
+    
+    /* Border Radius */
     --radius: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
-    --transition: all 0.3s ease;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-full: 50%;
+    
+    /* Transitions */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s ease;
+    --transition-slow: all 0.5s ease;
 }
 
 /* Reset and Base Styles */
@@ -39,6 +62,110 @@ body {
     color: var(--text);
     background: var(--bg);
     font-size: 16px;
+    overflow-x: hidden;
+}
+
+/* Beautiful Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+/* Animation Classes */
+.animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-fadeInLeft {
+    animation: fadeInLeft 0.6s ease-out;
+}
+
+.animate-fadeInRight {
+    animation: fadeInRight 0.6s ease-out;
+}
+
+.animate-scaleIn {
+    animation: scaleIn 0.4s ease-out;
+}
+
+.animate-pulse {
+    animation: pulse 2s infinite;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
 }
 
 /* Typography */
@@ -80,12 +207,18 @@ a:hover {
 
 /* Header */
 .site-header {
-    background: var(--bg-light);
-    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-light);
     position: sticky;
     top: 0;
-    z-index: 100;
-    box-shadow: var(--shadow);
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition);
+}
+
+.site-header:hover {
+    box-shadow: var(--shadow-xl);
 }
 
 .header-inner {
@@ -100,8 +233,16 @@ a:hover {
     display: flex;
     align-items: center;
     font-weight: 800;
-    font-size: 1.25rem;
-    color: var(--primary);
+    font-size: 1.5rem;
+    background: var(--bg-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: var(--transition);
+}
+
+.brand:hover {
+    transform: scale(1.05);
 }
 
 .brand img {
@@ -118,30 +259,42 @@ a:hover {
 }
 
 .nav a {
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius);
-    color: var(--muted);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
     font-weight: 600;
     transition: var(--transition);
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.nav a:hover,
-.nav a.active {
-    background: rgba(8, 108, 107, 0.1);
+.nav a:hover {
+    background: var(--bg-gradient-light);
     color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.nav a.active {
+    background: var(--bg-gradient);
+    color: white;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
 }
 
 .nav a.active::after {
     content: '';
     position: absolute;
-    bottom: -1px;
+    bottom: -8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 20px;
-    height: 2px;
+    width: 6px;
+    height: 6px;
     background: var(--primary);
-    border-radius: 1px;
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 0 3px white;
 }
 
 /* Cards */
@@ -164,8 +317,8 @@ a:hover {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--radius);
+    padding: 0.875rem 1.75rem;
+    border-radius: var(--radius-md);
     border: none;
     font-weight: 600;
     font-size: 1rem;
@@ -173,6 +326,33 @@ a:hover {
     transition: var(--transition);
     text-decoration: none;
     gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+    transform: translateY(0);
 }
 
 .btn:disabled {
@@ -182,56 +362,66 @@ a:hover {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    background: var(--bg-gradient);
     color: white;
-    box-shadow: 0 4px 12px rgba(8, 108, 107, 0.3);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #065f5e, var(--primary));
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(8, 108, 107, 0.4);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 .btn-secondary {
-    background: var(--muted);
+    background: linear-gradient(135deg, var(--muted), #9ca3af);
     color: white;
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
 }
 
 .btn-secondary:hover {
-    background: var(--muted-light);
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
 }
 
 .btn-success {
     background: linear-gradient(135deg, var(--success), var(--success-light));
     color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .btn-success:hover {
     background: linear-gradient(135deg, #047857, var(--success));
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
 .btn-danger {
     background: linear-gradient(135deg, var(--danger), var(--danger-light));
     color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .btn-danger:hover {
-    background: linear-gradient(135deg, #b91c1c, var(--danger));
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, #dc2626, var(--danger));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
 }
 
 .btn-outline {
     background: transparent;
     border: 2px solid var(--primary);
     color: var(--primary);
+    box-shadow: none;
 }
 
 .btn-outline:hover {
-    background: var(--primary);
+    background: var(--bg-gradient);
     color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 /* Forms */
